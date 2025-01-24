@@ -10,29 +10,59 @@ const products = [
 ];
 
 // DOM elements
-const productList = document.getElementById("product-list");
+let cart = JSON.parse(sessionStorage.getItem("cart")) || [];
 
-// Render product list
-function renderProducts() {
-  products.forEach((product) => {
-    const li = document.createElement("li");
-    li.innerHTML = `${product.name} - $${product.price} <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>`;
-    productList.appendChild(li);
+// Function to render the product list on the page
+function renderProductList() {
+  const productList = document.getElementById("product-list");
+  productList.innerHTML = ''; // Clear the list before rendering
+
+  products.forEach(product => {
+    const productItem = document.createElement("li");
+    productItem.innerHTML = `
+      ${product.name} - $${product.price} 
+      <button onclick="addToCart(${product.id})">Add to Cart</button>
+    `;
+    productList.appendChild(productItem);
   });
 }
 
-// Render cart list
-function renderCart() {}
+// Function to render the cart on the page
+function renderCart() {
+  const cartList = document.getElementById("cart-list");
+  cartList.innerHTML = ''; // Clear the cart list before rendering
 
-// Add item to cart
-function addToCart(productId) {}
+  if (cart.length === 0) {
+    cartList.innerHTML = '<li>Your cart is empty.</li>';
+  } else {
+    cart.forEach(item => {
+      const cartItem = document.createElement("li");
+      cartItem.innerHTML = `${item.name} - $${item.price}`;
+      cartList.appendChild(cartItem);
+    });
+  }
+}
 
-// Remove item from cart
-function removeFromCart(productId) {}
+// Function to add product to cart
+function addToCart(productId) {
+  const product = products.find(p => p.id === productId);
+  if (product) {
+    cart.push(product); // Add the product to the cart
+    sessionStorage.setItem("cart", JSON.stringify(cart)); // Save cart to session storage
+    renderCart(); // Update cart display
+  }
+}
 
-// Clear cart
-function clearCart() {}
+// Function to clear the cart
+function clearCart() {
+  cart = []; // Empty the cart array
+  sessionStorage.setItem("cart", JSON.stringify(cart)); // Save empty cart to session storage
+  renderCart(); // Update cart display
+}
+
+// Clear cart button functionality
+document.getElementById("clear-cart-btn").addEventListener("click", clearCart);
 
 // Initial render
-renderProducts();
+renderProductList();
 renderCart();
